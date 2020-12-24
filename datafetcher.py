@@ -51,4 +51,4 @@ def get_all_binance(symbol, kline_size, save=False):
     return data_df
 
 
-data = get_all_binance('BTCUSDT', '1h', save=True)
+data = get_all_binance('BTCUSDT', '1d', save=True)
