@@ -2,22 +2,23 @@ import os
 import time
 
 import pandas as pd
-from finrl.config import config
-from finrl.model.models import DRLAgent
-from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv, VecCheckNan
 from stockstats import StockDataFrame as Sdf
 
+from agent import DRLAgent
 from env import SinglePairEnv
 
 # Read data from local csv file
-data = pd.read_csv(os.path.join("data", "BTCUSDT-1d-data.csv"))
-data.drop(columns=['close_time', 'quote_av', 'tb_base_av', 'tb_quote_av', 'ignore'], inplace=True)
-data.rename(columns={'timestamp': 'date'}, inplace=True)
+# data = pd.read_csv(os.path.join("data", "BTCUSDT-1d-data.csv"))
+# data.drop(columns=['close_time', 'quote_av', 'tb_base_av', 'tb_quote_av', 'ignore'], inplace=True)
+# data.rename(columns={'timestamp': 'date'}, inplace=True)
+data = pd.read_csv(os.path.join("data", "BTC-USD.csv"))
+data.columns = data.columns.str.lower()
 
 # Add tech indicator columns
 df = Sdf.retype(data)
-tech_indicator_list = config.TECHNICAL_INDICATORS_LIST + \
-                      ['kdjk', 'open_2_sma', 'boll', 'close_10.0_le_5_c', 'wr_10', 'dma', 'trix']
+tech_indicator_list = ['macd', 'rsi_30', 'cci_30', 'dx_30', 'kdjk', 'open_2_sma', 'boll', 'close_10.0_le_5_c', 'wr_10',
+                       'dma', 'trix']
 for indicator in tech_indicator_list:
     _ = df[indicator]
 
@@ -47,6 +48,7 @@ print(df_train.head())
 # Create env and agent
 state_space = 7 + len(tech_indicator_list)
 train_env = DummyVecEnv([lambda: SinglePairEnv(df_train, 10000, 0.002, 1e-4, state_space, tech_indicator_list, 150)])
+train_env = VecCheckNan(train_env, raise_exception=True)
 
 agent = DRLAgent(env=train_env)
 
@@ -58,18 +60,15 @@ a2c_params_tuning = {'n_steps': 5,
                      'ent_coef': 0.005,
                      'learning_rate': 0.0007,
                      'verbose': 0,
-                     'timesteps': 200000}
+                     'timesteps': 500000}
 model_a2c = agent.train_A2C(model_name="A2C_{}".format(now), model_params=a2c_params_tuning)
 
-# Validate the model
+# now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
+# ddpg_params_tuning = {
+#     'batch_size': 128,
+#     'buffer_size': 100000,
+#     'learning_rate': 0.0003,
+#     'verbose': 0,
+#     'timesteps': 30000}
+# model_ddpg = agent.train_DDPG(model_name="DDPG_{}".format(now), model_params=ddpg_params_tuning)
 
-start = time.time()
-# dfv = df_val[-60:]
-val_env = DummyVecEnv([lambda: SinglePairEnv(df_val, 10000, 0.002, 1e-4, state_space, tech_indicator_list, 150)])
-obs = val_env.reset()
-done = False
-while not done:
-    action, _ = model_a2c.predict(obs)
-    obs, reward, done, _ = val_env.step(action)
-end = time.time()
-print('Evaluation time: ', (end - start) / 60, ' minutes')

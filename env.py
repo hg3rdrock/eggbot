@@ -106,6 +106,8 @@ class SinglePairEnv(gym.Env):
         self.tech_indicator_list = tech_indicator_list
         self.turbulence_threshold = turbulence_threshold
         self.ts = ts
+        self.buy_actions = []
+        self.sell_actions = []
 
         self.action_space = spaces.Box(low=-1, high=1, shape=(1,))
         self.observation_space = spaces.Box(low=0, high=np.inf, shape=(state_space,))
@@ -153,6 +155,7 @@ class SinglePairEnv(gym.Env):
             print(f"total cost: {self.cost}")
             print(f"total trades: {self.trades}")
 
+            self.df_account_value = pd.DataFrame({'date': self.date_memory, 'account_value': self.asset_memory})
             df_total_value = pd.DataFrame(self.asset_memory)
             df_total_value.columns = ['account_value']
             df_total_value['daily_return'] = df_total_value.pct_change(1)
@@ -183,6 +186,8 @@ class SinglePairEnv(gym.Env):
             self.reward = end_total_asset - begin_total_asset
             self.rewards_memory.append(self.reward)
             self.reward = self.reward * self.reward_scaling
+            if self.reward < 0:
+                self.reward *= 1.1
 
         return self.state, self.reward, self.terminal, {}
 
@@ -195,6 +200,7 @@ class SinglePairEnv(gym.Env):
             self.state[2] -= self.state[2] * action
 
             self.trades += 1
+            self.sell_actions.append((self.ts, self.state[1]))
         else:
             pass
 
@@ -207,8 +213,16 @@ class SinglePairEnv(gym.Env):
             self.state[0] -= self.state[0] * action
 
             self.trades += 1
+            self.buy_actions.append((self.ts, self.state[1]))
         else:
             pass
+
+    def save_asset_memory(self):
+        # df_account_value = pd.DataFrame({'date': self.date_memory, 'account_value': self.asset_memory})
+        return self.df_account_value
+
+    def saved_trades(self):
+        return np.array(self.buy_actions), np.array(self.sell_actions)
 
     def render(self, mode='human'):
         pass
