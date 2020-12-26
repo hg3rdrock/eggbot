@@ -111,24 +111,27 @@ class SinglePairEnv(gym.Env):
 
         self.action_space = spaces.Box(low=-1, high=1, shape=(1,))
         self.observation_space = spaces.Box(low=0, high=np.inf, shape=(state_space,))
-        self.data = self.df.iloc[self.ts]
-        self.terminal = False
-        self.state = [self.initial_amount] + [self.data.close] + [0] + \
-                     sum([[self.data[ti]] for ti in tech_indicator_list], []) + \
-                     [self.data.open, self.data.high, self.data.low, self.data.daily_return]
 
-        self.reward = 0
-        self.cost = 0
-        self.asset_memory = [self.initial_amount]
-        self.rewards_memory = []
-        self.actions_memory = []
-        self.date_memory = [self.data.date]
-        self.close_price_memory = [self.data.close]
-        self.trades = 0
+        # self.data = self.df.iloc[self.ts]
+        # self.terminal = False
+        # self.state = [self.initial_amount] + [self.data.close] + [0] + \
+        #              sum([[self.data[ti]] for ti in tech_indicator_list], []) + \
+        #              [self.data.open, self.data.high, self.data.low, self.data.daily_return]
+        #
+        # self.reward = 0
+        # self.cost = 0
+        # self.asset_memory = [self.initial_amount]
+        # self.rewards_memory = []
+        # self.actions_memory = []
+        # self.date_memory = [self.data.date]
+        # # self.close_price_memory = [self.data.close]
+        # self.trades = 0
 
     def reset(self):
         self.ts = 0
-        self.data = self.df.iloc[0]
+        # self.ts = random.randint(0, len(self.df) - 24*7)
+        self.start_ts = self.ts
+        self.data = self.df.iloc[self.ts]
         self.terminal = False
         self.state = [self.initial_amount] + [self.data.close] + [0] + \
                      sum([[self.data[ti]] for ti in self.tech_indicator_list], []) + \
@@ -146,6 +149,7 @@ class SinglePairEnv(gym.Env):
 
     def step(self, actions):
         self.terminal = self.ts >= len(self.df) - 1
+        # self.terminal = self.ts - self.start_ts >= 24 * 7
 
         if self.terminal:
             end_total_asset = self.state[0] + self.state[1] * self.state[2]
@@ -182,7 +186,7 @@ class SinglePairEnv(gym.Env):
             end_total_asset = self.state[0] + self.state[1] * self.state[2]
             self.asset_memory.append(end_total_asset)
             self.date_memory.append(self.data.date)
-            self.close_price_memory.append(self.data.close)
+            # self.close_price_memory.append(self.data.close)
             self.reward = end_total_asset - begin_total_asset
             self.rewards_memory.append(self.reward)
             self.reward = self.reward * self.reward_scaling
