@@ -3,7 +3,7 @@ import time
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from stable_baselines3 import A2C
+from stable_baselines3 import A2C, PPO
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stockstats import StockDataFrame as Sdf
 
@@ -29,29 +29,40 @@ df = df.dropna()
 # Split train/eval dataset
 # split_at = int(len(df) * 0.8)
 # df_val = df[split_at:]
-df_val = df[-365:-265]
+df_val = df[-365:]
 df_val.reset_index(inplace=True)
 
 # Reload model from disk
 # model = A2C.load('./trained_models/A2C_20201224-11h56.zip')
 # model = A2C.load('./trained_models/A2C_20201224-16h47.zip')
 # model = A2C.load('./trained_models/A2C_20201224-17h20.zip')
-model = A2C.load('./trained_models/A2C_20201224-20h24.zip')
-
-
-# model = PPO.load('./trained_models/PPO_20201225-22h08.zip')
-
+# model = A2C.load('./trained_models/A2C_20201224-20h24.zip')
+model = PPO.load('./trained_models/PPO_20201225-22h08.zip')
 
 # model = DDPG.load('./trained_models/DDPG_20201224-16h16.zip')
 
+def make_env(ds):
+    return SinglePairEnv(ds, 10000, 0.002, 0.0001, 18, tech_indicator_list, 150)
+
 def eval_model(model, ds):
-    start = time.time()
-    val_env = DummyVecEnv([lambda: SinglePairEnv(ds, 10000, 0.002, 1e-4, 18, tech_indicator_list, 150)])
+    val_env = DummyVecEnv([lambda: make_env(ds)])
     obs = val_env.reset()
     done = False
+    n_retrain_steps = 30
+    n_step = 0
+
+    start = time.time()
+
     while not done:
         action, _ = model.predict(obs)
         obs, reward, done, _ = val_env.step(action)
+        n_step += 1
+        # if n_step % n_retrain_steps == 0:
+        #     tmp_ds = ds[n_step-30:n_step]
+        #     model.set_env(DummyVecEnv([lambda: make_env(tmp_ds)]))
+        #     model.learn(1200)
+        #     print('model retrained')
+
     end = time.time()
     print('Evaluation time: ', (end - start) / 60, ' minutes')
 
