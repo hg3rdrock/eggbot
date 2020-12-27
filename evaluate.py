@@ -29,6 +29,7 @@ df = df.dropna()
 # Split train/eval dataset
 # split_at = int(len(df) * 0.8)
 # df_val = df[split_at:]
+# df_val = df[-365:-265]
 df_val = df[-365:]
 df_val.reset_index(inplace=True)
 
@@ -36,8 +37,9 @@ df_val.reset_index(inplace=True)
 # model = A2C.load('./trained_models/A2C_20201224-11h56.zip')
 # model = A2C.load('./trained_models/A2C_20201224-16h47.zip')
 # model = A2C.load('./trained_models/A2C_20201224-17h20.zip')
-# model = A2C.load('./trained_models/A2C_20201224-20h24.zip')
-model = PPO.load('./trained_models/PPO_20201225-22h08.zip')
+model = A2C.load('./trained_models/A2C_20201224-20h24.zip')
+# model = A2C.load('./trained_models/A2C_20201226-21h31.zip')
+# model = PPO.load('./trained_models/PPO_20201225-22h08.zip')
 
 # model = DDPG.load('./trained_models/DDPG_20201224-16h16.zip')
 
@@ -55,6 +57,7 @@ def eval_model(model, ds):
 
     while not done:
         action, _ = model.predict(obs)
+        # action = val_env.action_space.sample()
         obs, reward, done, _ = val_env.step(action)
         n_step += 1
         # if n_step % n_retrain_steps == 0:
@@ -73,7 +76,8 @@ def eval_model(model, ds):
     plt.figure(figsize=(16, 8))
     plt.plot(ds['close'])
     plt.plot(buys[:, 0], buys[:, 1], 'go')
-    plt.plot(sells[:, 0], sells[:, 1], 'ro')
+    if len(sells) > 0:
+        plt.plot(sells[:, 0], sells[:, 1], 'ro')
     plt.show()
 
 

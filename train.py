@@ -54,13 +54,13 @@ agent = DRLAgent(env=train_env)
 # Train the agent
 import datetime
 
-# now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
-# a2c_params_tuning = {'n_steps': 5,
-#                      'ent_coef': 0.005,
-#                      'learning_rate': 0.0007,
-#                      'verbose': 0,
-#                      'timesteps': 500000}
-# model_a2c = agent.train_A2C(model_name="A2C_{}".format(now), model_params=a2c_params_tuning)
+now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
+a2c_params_tuning = {'n_steps': 24,
+                     'ent_coef': 0.005,
+                     'learning_rate': 0.0007,
+                     'verbose': 0,
+                     'timesteps': 50000}
+model_a2c = agent.train_A2C(model_name="A2C_{}".format(now), model_params=a2c_params_tuning)
 
 # now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
 # ddpg_params_tuning = {
@@ -89,13 +89,13 @@ import datetime
 #                      'timesteps': 500000}
 # model_ppo = agent.train_PPO(model_name="PPO_{}".format(now), model_params=ppo_params_tuning)
 
-now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
-sac_params_tuning = {
-    'batch_size': 64,
-    'buffer_size': 100000,
-    'ent_coef': 'auto_0.1',
-    'learning_rate': 0.0001,
-    'learning_starts': 200,
-    'timesteps': 30000,
-    'verbose': 0}
-model_sac = agent.train_SAC(model_name="SAC_{}".format(now), model_params=sac_params_tuning)
+# now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
+# sac_params_tuning = {
+#     'batch_size': 64,
+#     'buffer_size': 10000,
+#     'ent_coef': 'auto_0.1',
+#     'learning_rate': 0.0001,
+#     'learning_starts': 200,
+#     'timesteps': 30000,
+#     'verbose': 1}
+# model_sac = agent.train_SAC(model_name="SAC_{}".format(now), model_params=sac_params_tuning)

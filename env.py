@@ -109,7 +109,7 @@ class SinglePairEnv(gym.Env):
         self.buy_actions = []
         self.sell_actions = []
 
-        self.action_space = spaces.Box(low=-1, high=1, shape=(1,))
+        self.action_space = spaces.Box(low=-1, high=1, shape=(1,), dtype=np.float32)
         self.observation_space = spaces.Box(low=0, high=np.inf, shape=(state_space,))
 
         # self.data = self.df.iloc[self.ts]
@@ -147,7 +147,7 @@ class SinglePairEnv(gym.Env):
 
         return self.state
 
-    def step(self, actions):
+    def step(self, action):
         self.terminal = self.ts >= len(self.df) - 1
         # self.terminal = self.ts - self.start_ts >= 24 * 7
 
@@ -171,7 +171,7 @@ class SinglePairEnv(gym.Env):
         else:
             begin_total_asset = self.state[0] + self.state[1] * self.state[2]
 
-            action = actions[0]
+            action = action[0]
             if action < -0.5:
                 self._sell(2 * abs(action) - 1)
             elif action > 0.5:
@@ -189,7 +189,7 @@ class SinglePairEnv(gym.Env):
             # self.close_price_memory.append(self.data.close)
             self.reward = end_total_asset - begin_total_asset
             self.rewards_memory.append(self.reward)
-            self.reward = self.reward * self.reward_scaling
+            # self.reward = self.reward * self.reward_scaling
             if self.reward < 0:
                 self.reward *= 1.1
 
