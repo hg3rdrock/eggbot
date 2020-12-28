@@ -31,7 +31,7 @@ class DRLAgent:
     def __init__(self, env):
         self.env = env
 
-    def train_A2C(self, model_name, model_params=config.A2C_PARAMS):
+    def train_A2C(self, model_name, model_params=config.A2C_PARAMS, callback=None):
         """A2C model"""
         from stable_baselines3 import A2C
 
@@ -44,7 +44,7 @@ class DRLAgent:
                     verbose=model_params['verbose'],
                     tensorboard_log=f"{config.TENSORBOARD_LOG_DIR}/{model_name}"
                     )
-        model.learn(total_timesteps=model_params['timesteps'], tb_log_name="A2C_run")
+        model.learn(total_timesteps=model_params['timesteps'], tb_log_name="A2C_run", callback=callback)
         end = time.time()
 
         model.save(f"{config.TRAINED_MODEL_DIR}/{model_name}")
