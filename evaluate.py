@@ -5,12 +5,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from stable_baselines3 import A2C, PPO
 from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.evaluation import evaluate_policy
 from stockstats import StockDataFrame as Sdf
 
 from env import SinglePairEnv
 
 # Read data from local csv file
-data = pd.read_csv(os.path.join("data", "BTCUSDT-1d-data.csv"))
+data = pd.read_csv(os.path.join("data", "BTCUSDT-4h-data.csv"))
 data.drop(columns=['close_time', 'quote_av', 'tb_base_av', 'tb_quote_av', 'ignore'], inplace=True)
 data.rename(columns={'timestamp': 'date'}, inplace=True)
 
@@ -30,7 +31,8 @@ df = df.dropna()
 # split_at = int(len(df) * 0.8)
 # df_val = df[split_at:]
 # df_val = df[-365:-265]
-df_val = df[-365:]
+# df_val = df[-365*6+250:-365*6+1200]
+df_val = df[-365*6:-65*6]
 df_val.reset_index(inplace=True)
 
 # Reload model from disk
@@ -38,8 +40,10 @@ df_val.reset_index(inplace=True)
 # model = A2C.load('./trained_models/A2C_20201224-16h47.zip')
 # model = A2C.load('./trained_models/A2C_20201224-17h20.zip')
 # model = A2C.load('./trained_models/A2C_20201224-20h24.zip')
+# model = A2C.load('./trained_models/A2C_20201230-14h38.zip')
+model = A2C.load('./trained_models/A2C_20201230-15h01.zip')
 # model = A2C.load('./trained_models/A2C_20201226-21h31.zip')
-model = PPO.load('./trained_models/PPO_20201225-22h08.zip')
+# model = PPO.load('./trained_models/PPO_20201225-22h08.zip')
 
 # model = DDPG.load('./trained_models/DDPG_20201224-16h16.zip')
 
@@ -56,8 +60,9 @@ def eval_model(model, ds):
     start = time.time()
 
     while not done:
-        action, _ = model.predict(obs)
+        action, _ = model.predict(obs, deterministic=True)
         # action = val_env.action_space.sample()
+        # print(action)
         obs, reward, done, _ = val_env.step(action)
         n_step += 1
         # if n_step % n_retrain_steps == 0:
@@ -69,9 +74,7 @@ def eval_model(model, ds):
     end = time.time()
     print('Evaluation time: ', (end - start) / 60, ' minutes')
 
-    df_assets = val_env.env_method('save_asset_memory')
-    # df_assets[0].plot(x='date', y='account_value')
-    # backtestStats(df_assets[0], ds)
+    # Plot trades
     buys, sells = val_env.env_method('saved_trades')[0]
     plt.figure(figsize=(16, 8))
     plt.plot(ds['close'])
@@ -92,3 +95,6 @@ def eval_model(model, ds):
 
 # Evaluate model on the whole validation dataset
 eval_model(model, df_val)
+# val_env = DummyVecEnv([lambda: make_env(df_val)])
+# mean_reward, std_reward = evaluate_policy(model, val_env)
+# print(f"mean_reward={mean_reward:.2f} +/- {std_reward}")

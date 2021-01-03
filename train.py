@@ -8,12 +8,12 @@ from agent import DRLAgent
 from env import SinglePairEnv
 
 # Read data from local csv file
-# data = pd.read_csv(os.path.join("data", "BTCUSDT-1d-data.csv"))
-# data.drop(columns=['close_time', 'quote_av', 'tb_base_av', 'tb_quote_av', 'ignore'], inplace=True)
-# data.rename(columns={'timestamp': 'date'}, inplace=True)
-data = pd.read_csv(os.path.join("data", "BTC-USD.csv"))
-print(f"training days: {len(data)}")
-data.columns = data.columns.str.lower()
+data = pd.read_csv(os.path.join("data", "BTCUSDT-4h-data.csv"))
+data.drop(columns=['close_time', 'quote_av', 'tb_base_av', 'tb_quote_av', 'ignore'], inplace=True)
+data.rename(columns={'timestamp': 'date'}, inplace=True)
+# data = pd.read_csv(os.path.join("data", "BTC-USD.csv"))
+# print(f"training days: {len(data)}")
+# data.columns = data.columns.str.lower()
 
 # Add tech indicator columns
 df = Sdf.retype(data)
@@ -25,7 +25,6 @@ for indicator in tech_indicator_list:
 # Add a new col: daily_return
 df = df.copy()
 df['daily_return'] = df.close.pct_change(1)
-# df = df.fillna(method='bfill').fillna(method="ffill")
 df = df.dropna()
 
 # Split train/eval dataset
@@ -60,7 +59,7 @@ import datetime
 #                      'ent_coef': 0.005,
 #                      'learning_rate': 0.0007,
 #                      'verbose': 0,
-#                      'timesteps': 50000}
+#                      'timesteps': 200000}
 # model_a2c = agent.train_A2C(model_name="A2C_{}".format(now), model_params=a2c_params_tuning)
 
 # now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
@@ -81,22 +80,22 @@ import datetime
 #     'timesteps': 30000}
 # model_td3 = agent.train_TD3(model_name="TD3_{}".format(now), model_params=td3_params_tuning)
 
-# now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
-# ppo_params_tuning = {'n_steps': 128,
-#                      'batch_size': 64,
-#                      'ent_coef': 0.005,
-#                      'learning_rate': 0.025,
-#                      'verbose': 0,
-#                      'timesteps': 500000}
-# model_ppo = agent.train_PPO(model_name="PPO_{}".format(now), model_params=ppo_params_tuning)
-
 now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
-sac_params_tuning = {
-    'batch_size': 64,
-    'buffer_size': 2000,
-    'ent_coef': 'auto_0.1',
-    'learning_rate': 0.0001,
-    'learning_starts': 100,
-    'timesteps': 10000,
-    'verbose': 1}
-model_sac = agent.train_SAC(model_name="SAC_{}".format(now), model_params=sac_params_tuning)
+ppo_params_tuning = {'n_steps': 128,
+                     'batch_size': 64,
+                     'ent_coef': 0.005,
+                     'learning_rate': 0.0025,
+                     'verbose': 0,
+                     'timesteps': 200000}
+model_ppo = agent.train_PPO(model_name="PPO_{}".format(now), model_params=ppo_params_tuning)
+
+# now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
+# sac_params_tuning = {
+#     'batch_size': 64,
+#     'buffer_size': 2000,
+#     'ent_coef': 'auto_0.1',
+#     'learning_rate': 0.0001,
+#     'learning_starts': 100,
+#     'timesteps': 10000,
+#     'verbose': 1}
+# model_sac = agent.train_SAC(model_name="SAC_{}".format(now), model_params=sac_params_tuning)
