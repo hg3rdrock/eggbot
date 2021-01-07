@@ -4,11 +4,12 @@ from sklearn.preprocessing import MinMaxScaler
 
 class CryptoPortfolioEnv(Env):
 
-    def __init__(self, df1, df2):
+    def __init__(self, df1, df2, training=True):
         super(CryptoPortfolioEnv, self).__init__()
 
         self.df1 = df1
         self.df2 = df2
+        self.training = training
         self.obs_df1 = df1.copy()
         self.obs_df2 = df2.copy()
         self.n_lookback = 30
@@ -59,11 +60,17 @@ class CryptoPortfolioEnv(Env):
             self.assets[0] += usdt_amt * (1 - 0.002) / price1
             self.assets[1] -= min(usdt_amt * (1 - 0.002) / price2, self.assets[1])
             self.n_realloc += 1
+            if not self.training:
+                print(f"timestep: {self.ts}")
+                print(f"sell btc3s and buy btc for {usdt_amt} USDT")
         elif action < frac1 - 0.01:
             usdt_amt = (frac1 - action) * total_usdt
             self.assets[0] -= usdt_amt * (1 - 0.002) / price1
             self.assets[1] += usdt_amt * (1 - 0.002) / price2
             self.n_realloc += 1
+            if not self.training:
+                print(f"timestep: {self.ts}")
+                print(f"sell btc and buy btc3s for {usdt_amt} USDT")
 
     def _calc_balance(self):
         price1 = self.df1.iloc[self.ts]['close']
