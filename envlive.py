@@ -1,5 +1,6 @@
-import time
 import logging
+import time
+
 import ccxt
 import numpy as np
 from gym import spaces, Env
@@ -7,8 +8,11 @@ from gym import spaces, Env
 
 class HuobiLiveEnv(Env):
 
-    def __init__(self, simulate_mode=True, max_steps=100):
+    def __init__(self, init_amt1, init_amt2, simulate_mode=True, max_steps=100):
         super(HuobiLiveEnv, self).__init__()
+
+        self.init_amt1 = init_amt1
+        self.init_amt2 = init_amt2
         self.simulate_mode = simulate_mode
         self.max_steps = max_steps
 
@@ -29,7 +33,7 @@ class HuobiLiveEnv(Env):
 
     def reset(self):
         self.ts = 0
-        self.assets = np.array([0.1, 2400.0], dtype=np.float)
+        self.assets = np.array([self.init_amt1, self.init_amt2], dtype=np.float)
         self.n_realloc = 0
 
         obs = self._make_obs()

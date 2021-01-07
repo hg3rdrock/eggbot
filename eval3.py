@@ -36,8 +36,8 @@ def read_live_data(limit=120):
 df_val1, df_val2 = read_live_data()
 
 # Validate the model
-# model = A2C.load('./trained_models/CryptoPfoA2C_20210106-17h03.zip')
-model = A2C.load('./trained_models/CryptoPfoA2C_20210107-19h48.zip')
+model = A2C.load('./trained_models/CryptoPfoA2C_20210106-17h03.zip')
+# model = A2C.load('./trained_models/CryptoPfoA2C_20210107-19h48.zip')
 # model = A2C.load('./trained_models/CryptoPfoPPO_20210107-21h41.zip')
 
 val_env = DummyVecEnv([lambda: CryptoPortfolioEnv(df_val1, df_val2, training=False)])
