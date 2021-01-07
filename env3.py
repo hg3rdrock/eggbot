@@ -1,6 +1,6 @@
 import numpy as np
 from gym import spaces, Env
-from sklearn.preprocessing import MinMaxScaler
+
 
 class CryptoPortfolioEnv(Env):
 
@@ -65,7 +65,7 @@ class CryptoPortfolioEnv(Env):
                 print(f"sell btc3s and buy btc for {usdt_amt} USDT")
         elif action < frac1 - 0.01:
             usdt_amt = (frac1 - action) * total_usdt
-            self.assets[0] -= usdt_amt / price1
+            self.assets[0] -= min(usdt_amt / price1, self.assets[0])
             self.assets[1] += usdt_amt * (1 - 0.004) / price2
             self.n_realloc += 1
             if not self.training:

@@ -1,11 +1,12 @@
-import os, sys
-import pandas as pd
+import os
+import sys
+
 import ccxt
 import numpy as np
+import pandas as pd
 from stable_baselines3 import A2C
-from stable_baselines3.common.vec_env import DummyVecEnv, VecCheckNan
+from stable_baselines3.common.vec_env import DummyVecEnv
 
-from agent import DRLAgent
 from env3 import CryptoPortfolioEnv
 
 
@@ -21,29 +22,33 @@ def read_data(csv_file):
 _, df_val1 = read_data("Huobi_BTCUSDT_1h.csv")
 _, df_val2 = read_data("Huobi_BTC3S_1h.csv")
 
+
 # Read live data
-# def read_live_data(limit=100):
-#     exc = ccxt.huobipro()
-#     data1 = exc.fetchOHLCV('BTC/USDT', '1h', limit=limit)
-#     df1 = pd.DataFrame(data1, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'], dtype=np.float32)
-#     data2 = exc.fetchOHLCV('BTC3S/USDT', '1h', limit=limit)
-#     df2 = pd.DataFrame(data2, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'], dtype=np.float32)
-#     return df1, df2
-#
-# df_val1, df_val2 = read_live_data()
+def read_live_data(limit=120):
+    exc = ccxt.huobipro()
+    data1 = exc.fetchOHLCV('BTC/USDT', '1h', limit=limit)
+    df1 = pd.DataFrame(data1, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'], dtype=np.float32)
+    data2 = exc.fetchOHLCV('BTC3S/USDT', '1h', limit=limit)
+    df2 = pd.DataFrame(data2, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'], dtype=np.float32)
+    return df1, df2
+
+
+df_val1, df_val2 = read_live_data()
 
 # Validate the model
-model = A2C.load('./trained_models/CryptoPfoA2C_20210106-17h03.zip')
-
-print(f"buy_hold: {df_val1.iloc[30]['open']} ==> {df_val1.iloc[-1]['close']}")
+# model = A2C.load('./trained_models/CryptoPfoA2C_20210106-17h03.zip')
+model = A2C.load('./trained_models/CryptoPfoA2C_20210107-19h48.zip')
+# model = A2C.load('./trained_models/CryptoPfoPPO_20210107-21h41.zip')
 
 val_env = DummyVecEnv([lambda: CryptoPortfolioEnv(df_val1, df_val2, training=False)])
 obs = val_env.reset()
 done = False
 
 while not done:
-    action, _ = model.predict(obs)
+    action, _ = model.predict(obs, deterministic=False)
     obs, _, done, _ = val_env.step(action)
+
+print(f"buy_hold: {df_val1.iloc[30]['open']} ==> {df_val1.iloc[-1]['close']}")
 
 sys.exit("model evaluation done")
 # Plot trades

@@ -7,7 +7,7 @@ from envlive import HuobiLiveEnv
 
 # Set up logging
 logging.basicConfig(
-    filename="/home/root/goldegg.log",
+    filename="/root/goldegg.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s : %(message)s",
     datefmt="%m/%d/%Y %I:%M:%S %p"

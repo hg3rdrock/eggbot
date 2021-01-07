@@ -8,7 +8,7 @@ exchange = ccxt.huobipro()
 
 
 def fetch_save(symbol, csv_file):
-    data = exchange.fetchOHLCV(symbol, '1h')
+    data = exchange.fetchOHLCV(symbol, '1h', limit=2000)
     df = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'], dtype=np.float)
     df.to_csv(os.path.join(os.curdir, 'data', csv_file))
 
