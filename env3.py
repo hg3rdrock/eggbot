@@ -57,16 +57,16 @@ class CryptoPortfolioEnv(Env):
 
         if action > frac1 + 0.01:
             usdt_amt = (action - frac1) * total_usdt
-            self.assets[0] += usdt_amt * (1 - 0.002) / price1
-            self.assets[1] -= min(usdt_amt * (1 - 0.002) / price2, self.assets[1])
+            self.assets[0] += usdt_amt * (1 - 0.004) / price1
+            self.assets[1] -= min(usdt_amt / price2, self.assets[1])
             self.n_realloc += 1
             if not self.training:
                 print(f"timestep: {self.ts}")
                 print(f"sell btc3s and buy btc for {usdt_amt} USDT")
         elif action < frac1 - 0.01:
             usdt_amt = (frac1 - action) * total_usdt
-            self.assets[0] -= usdt_amt * (1 - 0.002) / price1
-            self.assets[1] += usdt_amt * (1 - 0.002) / price2
+            self.assets[0] -= usdt_amt / price1
+            self.assets[1] += usdt_amt * (1 - 0.004) / price2
             self.n_realloc += 1
             if not self.training:
                 print(f"timestep: {self.ts}")

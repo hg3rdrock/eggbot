@@ -1,5 +1,5 @@
 import time
-
+import logging
 import ccxt
 import numpy as np
 from gym import spaces, Env
@@ -29,7 +29,7 @@ class HuobiLiveEnv(Env):
 
     def reset(self):
         self.ts = 0
-        self.assets = np.array([0.1, 0.0], dtype=np.float)
+        self.assets = np.array([0.1, 2400.0], dtype=np.float)
         self.n_realloc = 0
 
         obs = self._make_obs()
@@ -74,32 +74,50 @@ class HuobiLiveEnv(Env):
         if action > frac1 + 0.01:
             usdt_amt = (action - frac1) * total_usdt
             if usdt_amt <= 5:
-                print("usdt amt too low")
+                logging.debug(f"realloc usdt amt too low, action:{action}, frac1:{frac1}")
                 return
-            self.assets[0] += usdt_amt * (1 - 0.002) / self.price1
-            self.assets[1] -= min(usdt_amt * (1 - 0.002) / self.price2, self.assets[1])
+            self.assets[0] += usdt_amt * (1 - 0.004) / self.price1
+            self.assets[1] -= min(usdt_amt / self.price2, self.assets[1])
             self.n_realloc += 1
-            print(f"timestep: {self.ts}")
-            print(f"sell btc3s and buy btc for {usdt_amt} USDT")
+            logging.info(f"timestep: {self.ts}")
+            logging.info(f"sell btc3s and buy btc for {usdt_amt} USDT")
             if not self.simulate_mode:
-                self.exc.create_market_sell_order(self.pair2, min(usdt_amt * (1 - 0.002) / self.price2, self.assets[1]))
-                self.exc.create_market_buy_order(self.pair1, usdt_amt)
+                ok = self._sell(self.pair2, min(usdt_amt / self.price2, self.assets[1]))
+                if ok:
+                    self._buy(self.pair1, usdt_amt * (1 - 0.002))
         elif action < frac1 - 0.01:
             usdt_amt = (frac1 - action) * total_usdt
             if usdt_amt <= 5:
-                print("usdt amt too low")
+                logging.debug(f"realloc usdt amt too low, action:{action}, frac1:{frac1}")
                 return
-            self.assets[0] -= usdt_amt * (1 - 0.002) / self.price1
-            self.assets[1] += usdt_amt * (1 - 0.002) / self.price2
+            self.assets[0] -= usdt_amt / self.price1
+            self.assets[1] += usdt_amt * (1 - 0.004) / self.price2
             self.n_realloc += 1
-            print(f"timestep: {self.ts}")
-            print(f"sell btc and buy btc3s for {usdt_amt} USDT")
+            logging.info(f"timestep: {self.ts}")
+            logging.info(f"sell btc and buy btc3s for {usdt_amt} USDT")
             if not self.simulate_mode:
-                self.exc.create_market_sell_order(self.pair1, min(usdt_amt * (1 - 0.002) / self.price1, self.assets[0]))
-                self.exc.create_market_buy_order(self.pair2, usdt_amt)
+                ok = self._sell(self.pair1, min(usdt_amt / self.price1, self.assets[0]))
+                if ok:
+                    self._buy(self.pair2, usdt_amt * (1 - 0.002))
 
     def _calc_balance(self):
         return np.dot(self.assets, np.array([self.price1, self.price2]))
+
+    def _buy(self, symbol, amount):
+        try:
+            order = self.exc.create_market_buy_order(symbol, amount)
+            return True
+        except Exception:
+            logging.error(f"make buy order failed! symbol: {symbol}, amount: {amount}")
+            return False
+
+    def _sell(self, symbol, amount):
+        try:
+            order = self.exc.create_market_sell_order(symbol, amount)
+            return True
+        except Exception:
+            logging.error(f"make sell order failed! symbol: {symbol}, amount: {amount}")
+            return False
 
     def saved_trades(self):
         pass

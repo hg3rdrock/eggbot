@@ -22,9 +22,9 @@ df_train1, df_val1 = read_data("Huobi_BTCUSDT_1h.csv")
 df_train2, df_val2 = read_data("Huobi_BTC3S_1h.csv")
 
 train_env = DummyVecEnv([lambda: CryptoPortfolioEnv(df_train1, df_train2)])
-train_env = VecCheckNan(train_env, raise_exception=True)
+# train_env = VecCheckNan(train_env, raise_exception=True)
 
-agent = DRLAgent(env=train_env)
+# agent = DRLAgent(env=train_env)
 
 import datetime
 
