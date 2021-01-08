@@ -1,3 +1,4 @@
+import csv
 import logging
 import time
 
@@ -51,6 +52,7 @@ class HuobiLiveEnv(Env):
 
     def step(self, action):
         begin_balance = self._calc_balance()
+        self._record_balance(self.assets, self.price1, self.price2, begin_balance)
 
         self._alloc_assets(action[0])
 
@@ -122,6 +124,11 @@ class HuobiLiveEnv(Env):
         except Exception:
             logging.error(f"make sell order failed! symbol: {symbol}, amount: {amount}")
             return False
+
+    def _record_balance(self, assets, price1, price2, total_balance):
+        with open('balance.csv', 'a+', newline='') as f:
+            csv_writer = csv.writer(f)
+            csv_writer.writerow([self.ts, assets[0], assets[1], price1, price2, total_balance])
 
     def saved_trades(self):
         pass

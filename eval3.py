@@ -34,9 +34,11 @@ def read_live_data(limit=120):
 
 
 df_val1, df_val2 = read_live_data()
+print(f"btc price {df_val1.iloc[0]['close']} ==> {df_val1.iloc[-1]['close']}")
 
 # Validate the model
 model = A2C.load('./trained_models/CryptoPfoA2C_20210106-17h03.zip')
+# model = A2C.load('./trained_models/CryptoPfoA2C_20210107-17h10.zip')
 # model = A2C.load('./trained_models/CryptoPfoA2C_20210107-19h48.zip')
 # model = A2C.load('./trained_models/CryptoPfoPPO_20210107-21h41.zip')
 
@@ -45,7 +47,7 @@ obs = val_env.reset()
 done = False
 
 while not done:
-    action, _ = model.predict(obs, deterministic=False)
+    action, _ = model.predict(obs, deterministic=True)
     obs, _, done, _ = val_env.step(action)
 
 print(f"buy_hold: {df_val1.iloc[30]['open']} ==> {df_val1.iloc[-1]['close']}")
