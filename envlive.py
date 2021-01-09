@@ -90,6 +90,7 @@ class HuobiLiveEnv(Env):
             if not self.simulate_mode:
                 ok = self._sell(self.pair2, min(usdt_amt / self.price2, self.assets[1]))
                 if ok:
+                    time.sleep(2)
                     self._buy(self.pair1, usdt_amt * (1 - 0.002))
         elif action < frac1 - 0.01:
             usdt_amt = (frac1 - action) * total_usdt
@@ -104,6 +105,7 @@ class HuobiLiveEnv(Env):
             if not self.simulate_mode:
                 ok = self._sell(self.pair1, min(usdt_amt / self.price1, self.assets[0]))
                 if ok:
+                    time.sleep(2)
                     self._buy(self.pair2, usdt_amt * (1 - 0.002))
 
     def _calc_balance(self):

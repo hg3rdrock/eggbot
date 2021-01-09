@@ -30,7 +30,7 @@ logging.basicConfig(
 model = A2C.load('./trained_models/CryptoPfoA2C_20210106-17h03.zip')
 
 # Create live environment
-val_env = DummyVecEnv([lambda: HuobiLiveEnv(0.1, 0, simulate_mode=args.simulator, max_steps=24 * 30)])
+val_env = DummyVecEnv([lambda: HuobiLiveEnv(0.05, 280, simulate_mode=args.simulator, max_steps=24 * 30)])
 obs = val_env.reset()
 done = False
 
