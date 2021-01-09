@@ -33,7 +33,7 @@ def read_live_data(limit=120):
     return df1, df2
 
 
-df_val1, df_val2 = read_live_data()
+df_val1, df_val2 = read_live_data(24 * 7)
 print(f"btc price {df_val1.iloc[0]['close']} ==> {df_val1.iloc[-1]['close']}")
 
 # Validate the model

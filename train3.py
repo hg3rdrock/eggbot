@@ -45,7 +45,7 @@ model = A2C('MlpPolicy', train_env,
 # model.save(f"trained_models/CryptoPfoA2C_{now}")
 
 now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
-ppo_params_tuning = {'n_steps': 128,
+ppo_params_tuning = {'n_steps': 64,
                      'batch_size': 64,
                      'ent_coef': 0.005,
                      'learning_rate': 0.0025,
