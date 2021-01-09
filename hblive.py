@@ -1,5 +1,4 @@
 import ccxt
-import numpy as np
 
 exc = ccxt.huobipro({
     'apiKey': 'mk0lklo0de-bab860fb-e28d3608-eab36',
@@ -9,8 +8,8 @@ exc = ccxt.huobipro({
     }
 })
 
-order = exc.create_market_sell_order('BTC3S/USDT', 100.00002345)
-# order = exc.create_market_buy_order('BTC3S/USDT', 5.000235)
+# order = exc.create_market_sell_order('BTC3S/USDT', 100.00002345)
+order = exc.create_market_buy_order('BTC3S/USDT', 9.9956654090638)
 print(order)
 
 # h1 = exc.fetchOHLCV('BTC/USDT', '1h', limit=30)
