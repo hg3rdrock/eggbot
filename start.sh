@@ -1,0 +1,1 @@
+nohup python golive.py --logto livetrades.log &
