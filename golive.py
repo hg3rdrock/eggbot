@@ -21,7 +21,7 @@ else:
 # Set up logging
 logging.basicConfig(
     filename=logfile_name,
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s - %(levelname)s : %(message)s",
     datefmt="%m/%d/%Y %I:%M:%S %p"
 )

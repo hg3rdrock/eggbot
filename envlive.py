@@ -127,7 +127,7 @@ class HuobiLiveEnv(Env):
             order = self.exc.create_market_buy_order(symbol, amount)
             return True
         except Exception as e:
-            logging.debug(e)
+            print(e)
             logging.error(f"make buy order failed! symbol: {symbol}, amount: {amount}")
             return False
 
@@ -136,7 +136,7 @@ class HuobiLiveEnv(Env):
             order = self.exc.create_market_sell_order(symbol, amount)
             return True
         except Exception as e:
-            logging.debug(e)
+            print(e)
             logging.error(f"make sell order failed! symbol: {symbol}, amount: {amount}")
             return False
 
