@@ -97,12 +97,12 @@ class HuobiLiveEnv(Env):
                 ok = self._sell(self.pair2, delta_pair2)
                 if ok:
                     time.sleep(2)
-                    self._buy(self.pair1, delta_pair1)
+                    self._buy(self.pair1, usdt_amt * (1 - 0.002))
 
         elif action < frac1 - 0.01:
             usdt_amt = (frac1 - action) * total_usdt
             if usdt_amt <= 5:
-                logging.debug(f"realloc usdt amt too low, action:{action}, frac1:{frac1}")
+                logging.error(f"realloc usdt amt too low, action:{action}, frac1:{frac1}")
                 return
             logging.info(f"timestep: {self.ts}")
             logging.info(f"sell btc and buy btc3s for {usdt_amt} USDT")
@@ -117,7 +117,7 @@ class HuobiLiveEnv(Env):
                 ok = self._sell(self.pair1, delta_pair1)
                 if ok:
                     time.sleep(2)
-                    self._buy(self.pair2, delta_pair2)
+                    self._buy(self.pair2, usdt_amt * (1 - 0.002))
 
     def _calc_balance(self):
         return np.dot(self.assets, np.array([self.price1, self.price2]))
