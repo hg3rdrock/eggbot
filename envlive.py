@@ -123,22 +123,12 @@ class HuobiLiveEnv(Env):
         return np.dot(self.assets, np.array([self.price1, self.price2]))
 
     def _buy(self, symbol, amount):
-        try:
-            order = self.exc.create_market_buy_order(symbol, amount)
-            return True
-        except Exception as e:
-            print(e)
-            logging.error(f"make buy order failed! symbol: {symbol}, amount: {amount}")
-            return False
+        order = self.exc.create_market_buy_order(symbol, amount)
+        return order['info']['status'] == 'ok'
 
     def _sell(self, symbol, amount):
-        try:
-            order = self.exc.create_market_sell_order(symbol, amount)
-            return True
-        except Exception as e:
-            print(e)
-            logging.error(f"make sell order failed! symbol: {symbol}, amount: {amount}")
-            return False
+        order = self.exc.create_market_sell_order(symbol, amount)
+        return order['info']['status'] == 'ok'
 
     def _record_balance(self, assets, price1, price2, total_balance):
         with open('balance.csv', 'a+', newline='') as f:
