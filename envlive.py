@@ -123,7 +123,7 @@ class HuobiLiveEnv(Env):
         return np.dot(self.assets, np.array([self.price1, self.price2]))
 
     def _buy(self, symbol, amount):
-        order = self.exc.create_market_buy_order(symbol, amount)
+        order = self.exc.create_market_buy_order(symbol, int(amount))
         return order['info']['status'] == 'ok'
 
     def _sell(self, symbol, amount):

@@ -5,7 +5,6 @@ import pandas as pd
 from stable_baselines3 import A2C
 from stable_baselines3.common.vec_env import DummyVecEnv
 
-from agent import DRLAgent
 from env3 import CryptoPortfolioEnv
 
 
@@ -41,19 +40,19 @@ model = A2C('MlpPolicy', train_env,
             verbose=a2c_params_tuning['verbose'],
             tensorboard_log=f"tensorboard_log/CryptoA2C_{now}"
             )
-# model.learn(100000)
-# model.save(f"trained_models/CryptoPfoA2C_{now}")
+model.learn(150000)
+model.save(f"trained_models/CryptoPfoA2C_{now}")
 
-now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
-ppo_params_tuning = {'n_steps': 64,
-                     'batch_size': 64,
-                     'ent_coef': 0.005,
-                     'learning_rate': 0.0025,
-                     'verbose': 0,
-                     'timesteps': 200000}
-agent = DRLAgent(env=train_env)
-model_ppo = agent.train_PPO(model_name="CryptoPfoPPO_{}".format(now), model_params=ppo_params_tuning)
-
+# now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
+# ppo_params_tuning = {'n_steps': 64,
+#                      'batch_size': 64,
+#                      'ent_coef': 0.005,
+#                      'learning_rate': 0.0025,
+#                      'verbose': 0,
+#                      'timesteps': 200000}
+# agent = DRLAgent(env=train_env)
+# model_ppo = agent.train_PPO(model_name="CryptoPfoPPO_{}".format(now), model_params=ppo_params_tuning)
+#
 sys.exit("model trained")
 
 # model_a2c = agent.train_A2C(model_name="CryptoA2C_{}".format(now), model_params=a2c_params_tuning)

@@ -42,6 +42,7 @@ class CryptoPortfolioEnv(Env):
         reward = end_balance - begin_balance
 
         if done:
+            reward *= (self.assets[0] * self.assets[0])
             print(f"initial balance: {self.init_balance}")
             print(f"end balance: {end_balance}")
             print(f"end assets: {self.assets}")
@@ -57,7 +58,8 @@ class CryptoPortfolioEnv(Env):
 
         if action > frac1 + 0.01:
             usdt_amt = (action - frac1) * total_usdt
-            self.assets[0] += usdt_amt * (1 - 0.004) / price1
+            discount = 1.0 if self.training else (1 - 0.004)
+            self.assets[0] += usdt_amt * discount / price1
             self.assets[1] -= min(usdt_amt / price2, self.assets[1])
             self.n_realloc += 1
             if not self.training:
@@ -65,8 +67,9 @@ class CryptoPortfolioEnv(Env):
                 print(f"sell btc3s and buy btc for {usdt_amt} USDT")
         elif action < frac1 - 0.01:
             usdt_amt = (frac1 - action) * total_usdt
+            discount = 1.0 if self.training else (1 - 0.004)
             self.assets[0] -= min(usdt_amt / price1, self.assets[0])
-            self.assets[1] += usdt_amt * (1 - 0.004) / price2
+            self.assets[1] += usdt_amt * discount / price2
             self.n_realloc += 1
             if not self.training:
                 print(f"timestep: {self.ts}")

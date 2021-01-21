@@ -27,7 +27,8 @@ logging.basicConfig(
 )
 
 # Load the model
-model = A2C.load('./trained_models/CryptoPfoA2C_20210106-17h03.zip')
+# model = A2C.load('./trained_models/CryptoPfoA2C_20210106-17h03.zip')
+model = A2C.load('./trained_models/CryptoPfoA2C_20210119-16h04.zip')
 
 # Create live environment
 val_env = DummyVecEnv([lambda: HuobiLiveEnv(0.05, 280, simulate_mode=args.simulator, max_steps=24 * 30)])
