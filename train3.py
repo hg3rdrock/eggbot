@@ -20,6 +20,12 @@ def read_data(csv_file):
 df_train1, df_val1 = read_data("Huobi_BTCUSDT_1h.csv")
 df_train2, df_val2 = read_data("Huobi_BTC3S_1h.csv")
 
+data = pd.read_csv('./data/Huobi_BTCUSDT_1h.csv')
+df_train1 = data[-2000:-24*7]
+
+data2 = pd.read_csv('./data/Huobi_BTC1S_1h.csv')
+df_train2 = data2[-2000:-24*7]
+
 train_env = DummyVecEnv([lambda: CryptoPortfolioEnv(df_train1, df_train2)])
 # train_env = VecCheckNan(train_env, raise_exception=True)
 
@@ -27,7 +33,7 @@ train_env = DummyVecEnv([lambda: CryptoPortfolioEnv(df_train1, df_train2)])
 import datetime
 
 now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
-a2c_params_tuning = {'n_steps': 5,
+a2c_params_tuning = {'n_steps': 20,
                      'ent_coef': 0.005,
                      'learning_rate': 0.0007,
                      'verbose': 0,
@@ -40,7 +46,7 @@ model = A2C('MlpPolicy', train_env,
             verbose=a2c_params_tuning['verbose'],
             tensorboard_log=f"tensorboard_log/CryptoA2C_{now}"
             )
-model.learn(150000)
+model.learn(200000)
 model.save(f"trained_models/CryptoPfoA2C_{now}")
 
 # now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')

@@ -5,7 +5,6 @@ import time
 from binance.client import Client
 from datetime import timedelta, datetime
 from dateutil import parser
-from tqdm import tqdm_notebook  # (Optional, used for progress-bars)
 
 # API
 binance_api_key = '[REDACTED]'  # Enter your own API-key here

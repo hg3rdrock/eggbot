@@ -42,7 +42,7 @@ class CryptoPortfolioEnv(Env):
         reward = end_balance - begin_balance
 
         if done:
-            reward *= (self.assets[0] * self.assets[0])
+            reward *= (self.assets[0] ** 2)
             print(f"initial balance: {self.init_balance}")
             print(f"end balance: {end_balance}")
             print(f"end assets: {self.assets}")

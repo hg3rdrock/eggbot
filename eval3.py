@@ -33,19 +33,21 @@ def read_live_data(limit=120):
     return df1, df2
 
 
-df_val1, df_val2 = read_live_data(24 * 7 + 30)
+df_val1, df_val2 = read_live_data(24 * 1 + 30)
 print(f"btc price {df_val1.iloc[0]['close']} ==> {df_val1.iloc[-1]['close']}")
 
 # Validate the model
-model = A2C.load('./trained_models/CryptoPfoA2C_20210119-16h04.zip')
-# model = A2C.load('./trained_models/CryptoPfoPPO_20210107-21h41.zip')
+# model = A2C.load('./trained_models/CryptoPfoA2C_20210119-16h04.zip')
+# model = A2C.load('./trained_models/CryptoPfoA2C_20210122-16h02.zip')
+# model = A2C.load('./trained_models/CryptoPfoA2C_20210107-19h30.zip')
+model = A2C.load('./trained_models/CryptoPfoA2C_20210122-17h04.zip')
 
 val_env = DummyVecEnv([lambda: CryptoPortfolioEnv(df_val1, df_val2, training=False)])
 obs = val_env.reset()
 done = False
 
 while not done:
-    action, _ = model.predict(obs, deterministic=False)
+    action, _ = model.predict(obs, deterministic=True)
     obs, _, done, _ = val_env.step(action)
 
 print(f"buy_hold: {df_val1.iloc[30]['open']} ==> {df_val1.iloc[-1]['close']}")
